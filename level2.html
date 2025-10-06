@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Level-2: Test Smart Contracts</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            background: #f4f8fb;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            color: #223244;
+        }
+        .wrapper {
+            max-width: 750px;
+            margin: 50px auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 30px #c5dbfa33;
+            padding: 35px 40px 35px 40px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 32px;
+            color: #2160af;
+        }
+        .form-section {
+            margin-bottom: 28px;
+            padding: 20px;
+            background: #f9fbff;
+            border-radius: 8px;
+            box-shadow: 0 0.5px 8px #d8eafd22;
+        }
+        label {
+            font-weight: 600;
+            margin-bottom: 7px;
+            display: block;
+        }
+        .inputrow {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        input, select {
+            padding: 8px 12px;
+            border: 1px solid #b5c9de;
+            border-radius: 5px;
+            font-size: 15px;
+            margin-top: 2px;
+            background: #f7faff;
+        }
+        .btn {
+            background: #2765d3;
+            color: #fff;
+            border: none;
+            padding: 10px 35px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background 0.15s;
+            box-shadow: 0 2px 7px #bcd7fd55;
+        }
+        .btn:active {
+            background: #184999;
+        }
+        .log-section {
+            background: #ededf9;
+            border-radius: 7px;
+            margin-top: 37px;
+            padding: 18px 24px;
+            font-size: 15px;
+            box-shadow: 0 1px 6px #c8dafb20;
+        }
+        .log-title {
+            color: #1774bd;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+        th, td {
+            border: 1px solid #c9e0f7;
+            padding: 8px 12px;
+            border-radius: 3px;
+            text-align: left;
+        }
+        th {
+            background: #e6f0fa;
+            color: #245980;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <h2>Level-2: Develop & Test Smart Contracts</h2>
+    <form id="contractForm" class="form-section" autocomplete="off">
+        <div class="inputrow">
+            <label for="dealerId">Dealer ID</label>
+            <input type="text" id="dealerId" required>
+        </div>
+        <div class="inputrow">
+            <label for="msisdn">MSISDN</label>
+            <input type="text" id="msisdn" required>
+        </div>
+        <div class="inputrow">
+            <label for="mpin">MPIN</label>
+            <input type="password" id="mpin" required>
+        </div>
+        <div class="inputrow">
+            <label for="balance">Balance</label>
+            <input type="number" min="0" id="balance" required>
+        </div>
+        <div class="inputrow">
+            <label for="status">Status</label>
+            <select id="status">
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
+        </div>
+        <div class="inputrow">
+            <label for="transAmount">Trans Amount</label>
+            <input type="number" min="0" id="transAmount" required>
+        </div>
+        <div class="inputrow">
+            <label for="transType">Trans Type</label>
+            <select id="transType">
+                <option value="credit">Credit</option>
+                <option value="debit">Debit</option>
+            </select>
+        </div>
+        <div class="inputrow">
+            <label for="remarks">Remarks</label>
+            <input type="text" id="remarks">
+        </div>
+        <button class="btn" type="submit">Submit Contract</button>
+    </form>
+    <section class="log-section">
+        <div class="log-title">Transaction Log</div>
+        <table id="logTable">
+            <thead>
+                <tr>
+                    <th>DealerID</th>
+                    <th>MSISDN</th>
+                    <th>Balance</th>
+                    <th>Status</th>
+                    <th>Amount</th>
+                    <th>Type</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Transactions will show here -->
+            </tbody>
+        </table>
+    </section>
+</div>
+<script>
+    // Fresher-level but neat: simulate smart contract testing
+
+    const contractForm = document.getElementById('contractForm');
+    const logTable = document.getElementById('logTable').querySelector('tbody');
+    let contracts = [];
+
+    contractForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        // Get form data
+        const contract = {
+            dealerId: document.getElementById('dealerId').value,
+            msisdn: document.getElementById('msisdn').value,
+            mpin: document.getElementById('mpin').value,    // in real app, MPIN would be hashed/encrypted
+            balance: document.getElementById('balance').value,
+            status: document.getElementById('status').value,
+            transAmount: document.getElementById('transAmount').value,
+            transType: document.getElementById('transType').value,
+            remarks: document.getElementById('remarks').value
+        };
+
+        // "Process": simple logic to update balance by transaction type
+        let updatedBalance = parseFloat(contract.balance);
+        let amount = parseFloat(contract.transAmount);
+        if (contract.transType === 'credit') {
+            updatedBalance += amount;
+        } else {
+            updatedBalance -= amount;
+        }
+        contract.updatedBalance = updatedBalance;
+
+        // Add to contracts array
+        contracts.push(contract);
+        addContractToTable(contract);
+
+        // Optionally reset form
+        contractForm.reset();
+    });
+
+    function addContractToTable(contract) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${contract.dealerId}</td>
+            <td>${contract.msisdn}</td>
+            <td>${contract.updatedBalance}</td>
+            <td>${contract.status}</td>
+            <td>${contract.transAmount}</td>
+            <td>${contract.transType}</td>
+            <td>${contract.remarks}</td>
+        `;
+        logTable.appendChild(row);
+    }
+</script>
+</body>
+</html>
